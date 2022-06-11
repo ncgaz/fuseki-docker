@@ -1,7 +1,6 @@
-# fly.toml file generated for jena-fuseki on 2022-05-05T16:35:21-04:00
+# fly.toml file generated for jena-fuseki on 2022-06-11T16:25:05-04:00
 
 app = "jena-fuseki"
-
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = []
@@ -23,7 +22,6 @@ processes = []
   processes = ["app"]
   protocol = "tcp"
   script_checks = []
-
   [services.concurrency]
     hard_limit = 25
     soft_limit = 20
