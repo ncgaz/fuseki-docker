@@ -21,18 +21,15 @@ ENV LANG C.UTF-8
 RUN set -eux; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
-       bash curl ca-certificates findutils coreutils gettext pwgen procps tini \
+    bash curl ca-certificates findutils coreutils gettext pwgen procps tini \
     ; \
     rm -rf /var/lib/apt/lists/*
 
-
-# Update below according to https://jena.apache.org/download/ 
+# Update below according to https://jena.apache.org/download/
 # and checksum for apache-jena-fuseki-4.x.x.tar.gz.sha512
-ENV FUSEKI_SHA512 c0b9ab61a57f2c0e027f9d1a07710a22e672eb87730a6460b0869f6a6997a2628703bd99b1590bccd38bdc2a0f78d7be17890b4b88f65ef5518c882c8736a6b3
-ENV FUSEKI_VERSION 4.0.0
-# No need for https due to sha512 checksums below
-ENV ASF_MIRROR http://www.apache.org/dyn/mirrors/mirrors.cgi?action=download&filename=
-ENV ASF_ARCHIVE http://archive.apache.org/dist/
+ENV FUSEKI_SHA512 1d60d596a4aa6f3c786e0da86190e406152ed2f5e0698960c6065a0b85bef5bde9844771ddb7cb22aefd95e38c1510ae4ac4d089a484211edc167080ec3af452
+ENV FUSEKI_VERSION 4.5.0
+ENV ASF_CDN https://dlcdn.apache.org/jena/binaries
 
 LABEL org.opencontainers.image.url https://github.com/stain/jena-docker/tree/master/jena-fuseki
 LABEL org.opencontainers.image.source https://github.com/stain/jena-docker/
@@ -54,18 +51,17 @@ WORKDIR /tmp
 # published sha512 checksum
 RUN echo "$FUSEKI_SHA512  fuseki.tar.gz" > fuseki.tar.gz.sha512
 # Download/check/unpack/move in one go (to reduce image size)
-RUN     (curl --location --silent --show-error --fail --retry-connrefused --retry 3 --output fuseki.tar.gz ${ASF_MIRROR}jena/binaries/apache-jena-fuseki-$FUSEKI_VERSION.tar.gz || \
-         curl --fail --silent --show-error --retry-connrefused --retry 3 --output fuseki.tar.gz $ASF_ARCHIVE/jena/binaries/apache-jena-fuseki-$FUSEKI_VERSION.tar.gz) && \
-        sha512sum -c fuseki.tar.gz.sha512 && \
-        tar zxf fuseki.tar.gz && \
-        mv apache-jena-fuseki* $FUSEKI_HOME && \
-        rm fuseki.tar.gz* && \
-        cd $FUSEKI_HOME && rm -rf fuseki.war && chmod 755 fuseki-server
+RUN curl --silent --show-error --fail --retry-connrefused --retry 3 --output fuseki.tar.gz ${ASF_CDN}/apache-jena-fuseki-$FUSEKI_VERSION.tar.gz && \
+    sha512sum -c fuseki.tar.gz.sha512 && \
+    tar zxf fuseki.tar.gz && \
+    mv apache-jena-fuseki* $FUSEKI_HOME && \
+    rm fuseki.tar.gz* && \
+    cd $FUSEKI_HOME && rm -rf fuseki.war && chmod 755 fuseki-server
 
 # Test the install by testing it's ping resource. 20s sleep because Docker Hub.
-RUN  $FUSEKI_HOME/fuseki-server & \
-     sleep 20 && \
-     curl -sS --fail 'http://localhost:3030/$/ping' 
+RUN $FUSEKI_HOME/fuseki-server --port 8080 & \
+    sleep 20 && \
+    curl -sS --fail 'http://localhost:8080/$/ping'
 
 # No need to kill Fuseki as our shell will exit after curl
 
@@ -91,7 +87,6 @@ WORKDIR $FUSEKI_HOME
 RUN rm -rf $FUSEKI_BASE
 VOLUME $FUSEKI_BASE
 
-EXPOSE 3030
-ENTRYPOINT ["/usr/bin/tini", "--", "/docker-entrypoint.sh"]
-CMD ["/jena-fuseki/fuseki-server"]
-
+EXPOSE 8080
+ENTRYPOINT ["/usr/bin/tini", "-s", "--", "/docker-entrypoint.sh"]
+CMD ["/jena-fuseki/fuseki-server", "--port", "8080"]

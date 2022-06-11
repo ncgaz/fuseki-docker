@@ -27,7 +27,7 @@ Different licenses apply to files added by different Docker layers:
 
 * stain/jena-fuseki [Dockerfile](https://github.com/stain/jena-docker/blob/master/jena-fuseki/Dockerfile): [Apache License, version 2.0](https://www.apache.org/licenses/LICENSE-2.0)
 * Apache Jena (`/jena-fuseki` in the image): [Apache License, version 2.0](https://www.apache.org/licenses/LICENSE-2.0)
-  See also: `docker run stain/jena-fuseki cat /jena-fuseki/NOTICE`
+  See also: `docker run jena-fuseki cat /jena-fuseki/NOTICE`
 * OpenJDK (`/usr/local/openjdk-11/` in the image): [GPL 2.0 with Classpath exception](https://openjdk.java.net/legal/gplv2+ce.html)
   See `/usr/local/openjdk-11/legal/` in image
 * Debian GNU/Linux (rest of `/`): [GPL 3](http://www.gnu.org/licenses/gpl-3.0) and [compatible licenses](https://www.debian.org/legal/licenses/), see `/usr/share/*/license` in image
@@ -37,13 +37,13 @@ Different licenses apply to files added by different Docker layers:
 
 To try out this image, try:
 
-    docker run -p 3030:3030 stain/jena-fuseki
+    docker run -p 8080:8080 jena-fuseki
 
-The Apache Jena Fuseki should then be available at http://localhost:3030/
+The Apache Jena Fuseki should then be available at http://localhost:8080/
 
 To expose Fuseki on a different port, simply modify first part of `-p`:
 
-    docker run -p 8080:3030 stain/jena-fuseki
+    docker run -p 3030:8080 jena-fuseki
 
 
 To load RDF graphs, you will need to log in as the `admin` user. To see the
@@ -56,12 +56,12 @@ volume `/fuseki` is an empty directory.
 You can override the admin-password using the form
 `-e ADMIN_PASSWORD=pw123`:
 
-    docker run -p 3030:3030 -e ADMIN_PASSWORD=pw123 stain/jena-fuseki
+    docker run -p 8080:8080 -e ADMIN_PASSWORD=pw123 jena-fuseki
 
 To specify Java settings such as the amount of memory to allocate for the
 heap (default: 1200 MiB), set the `JVM_ARGS` environment with `-e`:
 
-    docker run -p 3030:3030 -e JVM_ARGS=-Xmx2g stain/jena-fuseki
+    docker run -p 8080:8080 -e JVM_ARGS=-Xmx2g jena-fuseki
 
 
 ## Data persistence
@@ -79,12 +79,12 @@ Then start fuseki using `--volumes-from`. This allows you to later upgrade the
 jena-fuseki docker image without losing the data. The command below also uses
 `-d` to start the container in the background.
 
-    docker run -d --name fuseki -p 3030:3030 --volumes-from fuseki-data stain/jena-fuseki
+    docker run -d --name fuseki -p 8080:8080 --volumes-from fuseki-data jena-fuseki
 
 If you want to store fuseki data in a specified location on the host (e.g. for
 disk space or speed requirements), specify it using `-v`:
 
-    docker run -d --name fuseki -p 3030:3030 -v /ssd/data/fuseki:/fuseki stain/jena-fuseki
+    docker run -d --name fuseki -p 8080:8080 -v /ssd/data/fuseki:/fuseki jena-fuseki
 
 Note that the `/fuseki` volume must only be accessed from a single Fuseki
 container at a time.
@@ -107,7 +107,7 @@ To restart a named container (it will remember the volume and port config)
 
 To use [TDB v2](https://jena.apache.org/documentation/tdb2/) you can pass the environment variable with `-e TDB=2`
 
-     docker run -p 3030:3030 -e TDB=2 stain/jena-fuseki
+     docker run -p 8080:8080 -e TDB=2 jena-fuseki
 
 If you do so, then you need to use the appropriate `tdbloader2` for your data, see below for more details.
 
@@ -117,16 +117,16 @@ If you do so, then you need to use the appropriate `tdbloader2` for your data, s
 If you want to upgrade the Fuseki container named `fuseki` which use the data
 volume `fuseki-data` as recommended above, do:
 
-    docker pull stain/jena-fuseki
+    docker pull jena-fuseki
     docker stop fuseki
     docker rm fuseki
-    docker run -d --name fuseki -p 3030:3030 --volumes-from fuseki-data stain/jena-fuseki
+    docker run -d --name fuseki -p 8080:8080 --volumes-from fuseki-data jena-fuseki
 
 ## Create empty datasets
 
 You can create empty datasets at startup with:
 
-    docker run -d --name fuseki -p 3030:3030 -e FUSEKI_DATASET_1=mydataset -e FUSEKI_DATASET_2=otherdataset stain/jena-fuseki
+    docker run -d --name fuseki -p 8080:8080 -e FUSEKI_DATASET_1=mydataset -e FUSEKI_DATASET_2=otherdataset jena-fuseki
 
 This will create 2 empty datasets: mydataset and otherdataset.
 
@@ -143,7 +143,7 @@ command line tool and load datasets from the docker volume `/staging`.
 
 For help, try:
 
-    docker run stain/jena-fuseki ./load.sh
+    docker run jena-fuseki ./load.sh
 
 You will most likely want to load from a folder on the host computer by using
 `-v`, and into a data volume that you can then use with the regular fuseki.
@@ -160,7 +160,7 @@ from the Docker data volume `fuseki-data` (see above) by loading the two files
 computer:
 
     docker run --volumes-from fuseki-data -v /home/stain/ops/chembl19:/staging \
-       stain/jena-fuseki ./load.sh chembl19 cco.ttl.gz void.ttl.gz
+       jena-fuseki ./load.sh chembl19 cco.ttl.gz void.ttl.gz
 
 **Tip:** You might find it benefitial to run data loading from the data staging
 directory in order to use tab-completion etc. without exposing the path on the
@@ -221,7 +221,7 @@ Note that Fuseki TDB datasets are sub-folders in `/fuseki/databases/`.
 You will need to provide the assembler file on a mounted Docker volume together with the
 data:
 
-    docker run --volumes-from fuseki-data -v /home/stain/data:/staging stain/jena-fuseki \
+    docker run --volumes-from fuseki-data -v /home/stain/data:/staging jena-fuseki \
       ./tdbloader --desc=/staging/tdb.ttl
 
 Remember to use the Docker container's data volume paths within the assembler

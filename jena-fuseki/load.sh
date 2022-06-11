@@ -32,25 +32,25 @@ if [ $# -eq 0 ] ; then
   echo "$PATTERNS"
   echo ""
   echo "Set the environment variable TDBLOADER_OPTS for any additional"
-  echo "options to pass to tdbloader, e.g. --graph=https://example.org/graph#name
+  echo "options to pass to tdbloader, e.g. --graph=https://example.org/graph#name"
   exit 0
 fi
 
 cd /staging 2>/dev/null || echo "/staging not found" >&2
-echo "Current directory:" $(pwd)
+echo "Current directory:" "$(pwd)"
 
 DB=$1
 shift
 
 if [ $# -eq 0 ] ; then
-  patterns="$PATTERNS"
+  patterns=( "$PATTERNS" )
 else
-  patterns="$@"
+  patterns=( "$@" )
 fi
 
 files=""
-for f in $patterns; do
-  if [ -f $f ] ; then
+for f in "${patterns[@]}"; do
+  if [ -f "$f" ] ; then
     files="$files $f"
   else
     if [ $# -gt 0 ] ; then
@@ -62,14 +62,14 @@ done
 
 if [ "$files" == "" ] ; then
   echo "No files found for: " >&2
-  echo "$patterns" >&2
+  echo "${patterns[*]}" >&2
   exit 1
 fi
 
 echo "#########"
 echo "Loading to Fuseki TDB database $DB:"
 echo ""
-echo $files
+echo "$files"
 echo "#########"
 
-exec $FUSEKI_HOME/tdbloader $TDBLOADER_OPTS --loc=$FUSEKI_BASE/databases/$DB $files
+exec "$FUSEKI_HOME/tdbloader" "$TDBLOADER_OPTS" "--loc=$FUSEKI_BASE/databases/$DB" "$files"
