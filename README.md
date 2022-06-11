@@ -1,25 +1,15 @@
 # Jena Fuseki docker image
 
-* Docker image: [stain/jena-fuseki](https://hub.docker.com/r/stain/jena-fuseki/)
-* Base images:  [openjdk](https://hub.docker.com/r/_/openjdk/):11-jre-slim-buster
+* Based on Docker image: [stain/jena-fuseki](https://hub.docker.com/r/stain/jena-fuseki/)
+* Base images:  [eclipse-temurin](https://hub.docker.com/_/eclipse-temurin):17.0.3_7-jre
 * Source: [Dockerfile](https://github.com/stain/jena-docker/blob/master/jena-fuseki/Dockerfile), [Apache Jena Fuseki](https://jena.apache.org/download/)
 
-[![Build Status](https://travis-ci.com/stain/jena-docker.svg)](https://travis-ci.com/stain/jena-docker)
-
-[![](https://images.microbadger.com/badges/image/stain/jena-fuseki.svg)](https://microbadger.com/images/stain/jena-fuseki "stain/jena-fuseki")
-
-[![](https://images.microbadger.com/badges/version/stain/jena-fuseki:4.0.0.svg)](https://github.com/stain/jena-docker/ "Jena Fuseki 4.0.0")
-
-
-This is a [Docker](https://www.docker.com/) image for running
-[Apache Jena Fuseki](https://jena.apache.org/documentation/fuseki2/),
-which is a [SPARQL 1.1](http://www.w3.org/TR/sparql11-overview/) server with a
-web interface, backed by the
+This is a [Docker](https://www.docker.com/) image for running [Apache Jena Fuseki](https://jena.apache.org/documentation/fuseki2/), which
+is a [SPARQL 1.1](http://www.w3.org/TR/sparql11-overview/) server with a web interface, backed by the
 [Apache Jena TDB](https://jena.apache.org/documentation/tdb/) RDF triple store.
 
-Feel free to contact the [jena users
-list](https://jena.apache.org/help_and_support/) for any questions on using
-Jena or Fuseki.
+Feel free to contact the [jena users list](https://jena.apache.org/help_and_support/) for any questions on
+using Jena or Fuseki.
 
 ## License
 
@@ -28,10 +18,9 @@ Different licenses apply to files added by different Docker layers:
 * stain/jena-fuseki [Dockerfile](https://github.com/stain/jena-docker/blob/master/jena-fuseki/Dockerfile): [Apache License, version 2.0](https://www.apache.org/licenses/LICENSE-2.0)
 * Apache Jena (`/jena-fuseki` in the image): [Apache License, version 2.0](https://www.apache.org/licenses/LICENSE-2.0)
   See also: `docker run jena-fuseki cat /jena-fuseki/NOTICE`
-* OpenJDK (`/usr/local/openjdk-11/` in the image): [GPL 2.0 with Classpath exception](https://openjdk.java.net/legal/gplv2+ce.html)
-  See `/usr/local/openjdk-11/legal/` in image
-* Debian GNU/Linux (rest of `/`): [GPL 3](http://www.gnu.org/licenses/gpl-3.0) and [compatible licenses](https://www.debian.org/legal/licenses/), see `/usr/share/*/license` in image
-
+* Eclipse Temurin (`/opt/java/openjdk` in the image):  [Apache License, version 2.0](https://www.apache.org/licenses/LICENSE-2.0)
+* Debian GNU/Linux (rest of `/`): [GPL 3](http://www.gnu.org/licenses/gpl-3.0) and [compatible
+  licenses](https://www.debian.org/legal/licenses/), see `/usr/share/*/license` in image
 
 ## Use
 
@@ -45,21 +34,21 @@ To expose Fuseki on a different port, simply modify first part of `-p`:
 
     docker run -p 3030:8080 jena-fuseki
 
+To load RDF graphs, you will need to log in as the `admin` user. To
+see the automatically generated admin password, see the output from
+above, or use `docker logs` with the name of your container.
 
-To load RDF graphs, you will need to log in as the `admin` user. To see the
-automatically generated admin password, see the output from above, or
-use `docker logs` with the name of your container.
+Note that the password is only generated on the first run, e.g. when
+the volume `/fuseki` is an empty directory.
 
-Note that the password is only generated on the first run, e.g. when the
-volume `/fuseki` is an empty directory.
-
-You can override the admin-password using the form
-`-e ADMIN_PASSWORD=pw123`:
+You can override the admin-password using the form `-e
+ADMIN_PASSWORD=pw123`:
 
     docker run -p 8080:8080 -e ADMIN_PASSWORD=pw123 jena-fuseki
 
-To specify Java settings such as the amount of memory to allocate for the
-heap (default: 1200 MiB), set the `JVM_ARGS` environment with `-e`:
+To specify Java settings such as the amount of memory to allocate for
+the heap (default: 1200 MiB), set the `JVM_ARGS` environment with
+`-e`:
 
     docker run -p 8080:8080 -e JVM_ARGS=-Xmx2g jena-fuseki
 
@@ -239,11 +228,11 @@ and inspect `/fuseki` with the shell. Remember to restart fuseki afterwards:
     docker restart fuseki
 
 
-### Additional JARs on Fuseki classpath
+### Additional JARs on Fuseki classpath
 
-If you need to add additional JARs to the classpath, but do not want to 
-modify the volume `/fuseki`, then add the JARs to
-`/fuseki-extra` which will be added as `/fuseki/extra` on start.
+If you need to add additional JARs to the classpath, but do not want
+to modify the volume `/fuseki`, then add the JARs to `/fuseki-extra`
+which will be added as `/fuseki/extra` on start.
 
 
 ## Contact
@@ -252,11 +241,8 @@ For any feedback or questions on Jena, Fuseki or SPARQ, please use the
 [users@jena](https://jena.apache.org/help_and_support/) mailing list.
 
 
-For any issues with Jena or Fuseki, feel free to
-[raise a bug](https://jena.apache.org/help_and_support/bugs_and_suggestions.html).
+For any issues with Jena or Fuseki, feel free to [raise a bug](https://jena.apache.org/help_and_support/bugs_and_suggestions.html).
 
-For any issues with the packaging in this Docker image, or 
-its [Dockerfile](https://github.com/stain/jena-docker/),
-please raise a [pull request](https://github.com/stain/jena-docker/pulls) or
-[issue](https://github.com/stain/jena-docker/issues).
+For any issues with the packaging in this Docker image, or its
+[Dockerfile](https://github.com/stain/jena-docker/), please raise a [pull request](https://github.com/stain/jena-docker/pulls) or [issue](https://github.com/stain/jena-docker/issues).
 

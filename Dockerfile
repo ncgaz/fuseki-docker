@@ -14,7 +14,7 @@
 #   limitations under the License.
 
 
-FROM openjdk:11-jre-slim-buster
+FROM eclipse-temurin:17.0.3_7-jre
 MAINTAINER Stian Soiland-Reyes <stain@apache.org>
 
 ENV LANG C.UTF-8
@@ -42,7 +42,6 @@ LABEL org.opencontainers.image.authors "Apache Jena Fuseki by https://jena.apach
 
 # Config and data
 ENV FUSEKI_BASE /fuseki
-
 
 # Installation folder
 ENV FUSEKI_HOME /jena-fuseki
