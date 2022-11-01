@@ -2,11 +2,8 @@ APP := jena-fuseki
 REGION := iad
 VOLUME := fuseki_data
 MEMORY := 2048
-DATASET := NCG
-DATA := /Users/ryanshaw/Code/ncg-dataset/dataset.nt
 
-.DEFAULT_GOAL := dataset
-.PHONY: destroy deploy dataset
+.PHONY: destroy deploy ncg-dataset dogs-dataset
 
 destroy:
 	fly apps destroy $(APP) --yes
@@ -19,16 +16,18 @@ deploy:
 	fly scale memory $(MEMORY)
 	fly deploy
 
-data.nt: $(DATA)
-	cp $< $@
+ncg-dataset: DATASET = ncg
+ncg-dataset: DATAFILE = ncg.nt
+ncg-dataset: DATAFILE_SOURCE = ../ncg-dataset/dataset.nt
 
-dataset: data.nt
+dogs-dataset: DATASET = dogs
+dogs-dataset: DATAFILE = dogs.ttl
+
+ncg-dataset dogs-dataset:
+ifdef $(DATAFILE_SOURCE)
+	cp $(DATAFILE_SOURCE) dataset/$(DATAFILE)
+endif
 	curl \
 	--user admin \
-	--data dbName=NCG \
-	--data dbType=tdb2 \
-	https://$(APP).fly.dev/$$/datasets
-	curl \
-	--user admin \
-	--form $<=@$< \
+	--form $(DATAFILE)=@dataset/$(DATAFILE) \
 	https://$(APP).fly.dev/$(DATASET)/data

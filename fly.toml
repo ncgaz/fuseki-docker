@@ -1,4 +1,4 @@
-# fly.toml file generated for jena-fuseki on 2022-06-11T16:25:05-04:00
+# fly.toml file generated for jena-fuseki on 2022-11-01T13:36:38-04:00
 
 app = "jena-fuseki"
 kill_signal = "SIGINT"

@@ -1,21 +1,4 @@
-#   Licensed to the Apache Software Foundation (ASF) under one or more
-#   contributor license agreements.  See the NOTICE file distributed with
-#   this work for additional information regarding copyright ownership.
-#   The ASF licenses this file to You under the Apache License, Version 2.0
-#   (the "License"); you may not use this file except in compliance with
-#   the License.  You may obtain a copy of the License at
-#
-#       http://www.apache.org/licenses/LICENSE-2.0
-#
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
-
-
 FROM eclipse-temurin:17.0.3_7-jre
-MAINTAINER Stian Soiland-Reyes <stain@apache.org>
 
 ENV LANG C.UTF-8
 RUN set -eux; \
@@ -25,20 +8,10 @@ RUN set -eux; \
     ; \
     rm -rf /var/lib/apt/lists/*
 
-# Update below according to https://jena.apache.org/download/
-# and checksum for apache-jena-fuseki-4.x.x.tar.gz.sha512
-ENV FUSEKI_SHA512 1d60d596a4aa6f3c786e0da86190e406152ed2f5e0698960c6065a0b85bef5bde9844771ddb7cb22aefd95e38c1510ae4ac4d089a484211edc167080ec3af452
-ENV FUSEKI_VERSION 4.5.0
+# Fuseki version
+ENV FUSEKI_SHA512 12a7c242584fa739d0d1d2a4025267552069d8bf7b411545d0328e3cacc3bceddaac0584b405772b51464c33f695da86182a60480c72a661264677281771e700
+ENV FUSEKI_VERSION 4.6.1
 ENV ASF_CDN https://dlcdn.apache.org/jena/binaries
-
-LABEL org.opencontainers.image.url https://github.com/stain/jena-docker/tree/master/jena-fuseki
-LABEL org.opencontainers.image.source https://github.com/stain/jena-docker/
-LABEL org.opencontainers.image.documentation https://jena.apache.org/documentation/fuseki2/
-LABEL org.opencontainers.image.title "Apache Jena Fuseki"
-LABEL org.opencontainers.image.description "Fuseki is a SPARQL 1.1 server with a web interface, backed by the Apache Jena TDB RDF triple store."
-LABEL org.opencontainers.image.version ${FUSEKI_VERSION}
-LABEL org.opencontainers.image.licenses "(Apache-2.0 AND (GPL-2.0 WITH Classpath-exception-2.0) AND GPL-3.0)"
-LABEL org.opencontainers.image.authors "Apache Jena Fuseki by https://jena.apache.org/; this image by https://orcid.org/0000-0001-9842-9718"
 
 # Config and data
 ENV FUSEKI_BASE /fuseki
@@ -64,20 +37,18 @@ RUN $FUSEKI_HOME/fuseki-server --port 8080 & \
 
 # No need to kill Fuseki as our shell will exit after curl
 
-# As "localhost" is often inaccessible within Docker container,
-# we'll enable basic-auth with a random admin password
-# (which we'll generate on start-up)
-COPY shiro.ini $FUSEKI_HOME/shiro.ini
-COPY docker-entrypoint.sh /
-RUN chmod 755 /docker-entrypoint.sh
+COPY shiro.ini $FUSEKI_HOME/
 
+RUN mkdir $FUSEKI_HOME/dataset-config
+COPY dataset-config/*.ttl $FUSEKI_HOME/dataset-config/
+
+COPY entrypoint.sh /
+RUN chmod 755 /entrypoint.sh
 
 COPY load.sh $FUSEKI_HOME/
 COPY tdbloader $FUSEKI_HOME/
 COPY tdbloader2 $FUSEKI_HOME/
 RUN chmod 755 $FUSEKI_HOME/load.sh $FUSEKI_HOME/tdbloader $FUSEKI_HOME/tdbloader2
-#VOLUME /staging
-
 
 # Where we start our server from
 WORKDIR $FUSEKI_HOME
@@ -87,5 +58,5 @@ RUN rm -rf $FUSEKI_BASE
 VOLUME $FUSEKI_BASE
 
 EXPOSE 8080
-ENTRYPOINT ["/usr/bin/tini", "-s", "--", "/docker-entrypoint.sh"]
+ENTRYPOINT ["/usr/bin/tini", "-s", "--", "/entrypoint.sh"]
 CMD ["/jena-fuseki/fuseki-server", "--port", "8080"]
