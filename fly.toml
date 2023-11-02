@@ -9,7 +9,7 @@ primary_region = "iad"
 [build]
 
 [env]
-  JVM_ARGS = "-Xms1600M -Xmx1600M"
+  JVM_ARGS = "-Xms2G -Xmx3G"
 
 [[mounts]]
   source = "fuseki_data"

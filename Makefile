@@ -1,7 +1,7 @@
 APP := jena-fuseki
 REGION := iad
 VOLUME := fuseki_data
-MEMORY := 2048
+MEMORY := 4096
 
 .PHONY: destroy launch ncg-dataset dogs-dataset
 
