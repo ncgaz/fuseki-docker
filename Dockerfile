@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17.0.3_7-jre
+FROM eclipse-temurin:21-jre
 
 ENV LANG C.UTF-8
 RUN set -eux; \
