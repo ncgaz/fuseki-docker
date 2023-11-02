@@ -9,8 +9,8 @@ RUN set -eux; \
     rm -rf /var/lib/apt/lists/*
 
 # Fuseki version
-ENV FUSEKI_SHA512 84079078b761e31658c96797e788137205fc93091ab5ae511ba80bdbec3611f4386280e6a0dc378b80830f4e5ec3188643e2ce5e1dd35edfd46fa347da4dbe17
-ENV FUSEKI_VERSION 4.9.0
+ENV FUSEKI_SHA512 a4be52cc5f7f8767e362f893f28721f2887a3544ed779cd58fe0b32733575d97411b5a3bc2243995d6408e545bdefc5ab41c00b2c5d074df1dc0ca5063db5f83
+ENV FUSEKI_VERSION 4.10.0
 ENV ASF_CDN https://dlcdn.apache.org/jena/binaries
 
 # Config and data
